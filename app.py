@@ -78,7 +78,7 @@ availability = 'Ready To Move'
 #     return result
 from numpy.random import randint
 
-values = randint(10000,20000,1)
+values = randint(5000,11000,1)
 value = int(values)
 
 def prediction(bhk, balcony, sqft):
