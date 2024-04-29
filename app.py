@@ -59,9 +59,7 @@ availability = 'Ready To Move'
 
 
 
-with open('Pune-House-Price.pkl', 'rb') as rf:
 
-    model = pickle.load(rf)
 
 # Input in the form : Location, BHK, Bath, Balcony, Sqft, area_type, availability.
 
