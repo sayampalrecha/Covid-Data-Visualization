@@ -3,6 +3,7 @@ import streamlit as st
 # import sklearn
 import pandas as pd
 import numpy as np
+from numpy.random import randint
 
 st.title('Pune House Price Prediction App')
 st.write('Enter the following details:')
@@ -75,10 +76,14 @@ availability = 'Ready To Move'
 #     prediction = model.predict(df)
 #     result = int(prediction)
 #     return result
+from numpy.random import randint
+
+values = randint(10000,20000,1)
+value = int(values)
 
 def prediction(bhk, balcony, sqft):
     price = bhk*523
-    price1 = price+sqft*11225
+    price1 = price+sqft*value
     return price1
 
 button = st.button('predict')
