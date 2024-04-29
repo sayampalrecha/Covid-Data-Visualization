@@ -91,4 +91,4 @@ if button:
 
     # make prediction
     result = prediction(bhk, balcony, sqft)
-    st.success(f'The value of the house is Ruppees {result}')
+    st.success(f'The value of the house is ₹ {result}')
