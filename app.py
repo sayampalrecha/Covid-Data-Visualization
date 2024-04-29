@@ -82,7 +82,7 @@ values = randint(10000,20000,1)
 value = int(values)
 
 def prediction(bhk, balcony, sqft):
-    if bhk = 1:
+    if bhk == 1:
         price = bhk*523
     else:
         price = bhk*600
