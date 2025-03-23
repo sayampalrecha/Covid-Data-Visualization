@@ -1,98 +1,124 @@
 import streamlit as st
-# import pickle
-# import sklearn
+import plotly.graph_objects as go
+import plotly.express as px
 import pandas as pd
-import numpy as np
-from numpy.random import randint
 
-st.title('Pune House Price Prediction App')
-st.write('Enter the following details:')
+# Set page config - must be the first Streamlit command
+st.set_page_config(layout="wide", page_title="Stock Visualization")
 
+# Add a title and description
+st.title("📈 Interactive Stock Visualization")
+st.markdown("### Explore historical stock data with customizable parameters")
 
-left, right = st.columns((2,2))
-with right:
-    bhk = st.number_input("How many BHK")
-    st.write('You selected:', bhk)
-
-
-with left:
-    location = st.selectbox('How would you like to be contacted?',
-                        ('Alandi Road', 'Ambegaon Budruk', 'Anandnagar', 'Aundh', 'Aundh Road',
-        'Balaji Nagar', 'Baner', 'Baner road', 'Bhandarkar Road',
-        'Bhavani Peth', 'Bibvewadi', 'Bopodi', 'Budhwar Peth',
-        'Bund Garden Road', 'Camp', 'Chandan Nagar', 'Dapodi',
-        'Deccan Gymkhana', 'Dehu Road', 'Dhankawadi', 'Dhayari Phata',
-        'Dhole Patil Road', 'Erandwane', 'Fatima Nagar',
-        'Fergusson College Road', 'Ganesh Peth', 'Ganeshkhind', 'Ghorpade Peth',
-        'Ghorpadi', 'Gokhale Nagar', 'Gultekdi', 'Guruwar peth', 'Hadapsar',
-        'Hadapsar Industrial Estate', 'Hingne Khurd', 'Jangali Maharaj Road',
-        'Kalyani Nagar', 'Karve Nagar', 'Karve Road', 'Kasba Peth', 'Katraj',
-        'Khadaki', 'Khadki', 'Kharadi', 'Kondhwa', 'Kondhwa Budruk',
-        'Kondhwa Khurd', 'Koregaon Park', 'Kothrud', 'Law College Road',
-        'Laxmi Road', 'Lulla Nagar', 'Mahatma Gandhi Road', 'Mangalwar peth',
-        'Manik Bagh', 'Market yard', 'Model colony', 'Mukund Nagar', 'Mundhawa',
-        'Nagar Road', 'Nana Peth', 'Narayan Peth', 'Narayangaon', 'Navi Peth',
-        'Padmavati', 'Parvati Darshan', 'Pashan', 'Paud Road', 'Pirangut',
-        'Prabhat Road', 'Pune Railway Station', 'Rasta Peth', 'Raviwar Peth',
-        'Sadashiv Peth', 'Sahakar Nagar', 'Salunke Vihar', 'Sasson Road',
-        'Satara Road', 'Senapati Bapat Road', 'Shaniwar Peth', 'Shivaji Nagar',
-        'Shukrawar Peth', 'Sinhagad Road', 'Somwar Peth', 'Swargate',
-        'Tilak Road', 'Uruli Devachi', 'Vadgaon Budruk', 'Viman Nagar',
-        'Vishrant Wadi', 'Wadgaon Sheri', 'Wagholi', 'Wakadewadi', 'Wanowrie',
-        'Warje', 'Yerawada'))
-    st.write('You selected:', location)
-
-with left:
-    balcony=st.selectbox('Number of balcony here',('1','2'))
-    st.write('You selected:', balcony)
-
-with right:
-    bath=st.selectbox('Number of Bathroom',('1','2','3','4','5','6','7','8','9','10'))
-    st.write('You selected:', bath)
-
-with left:
-    sqft = st.number_input("How many sqft")
-    st.write('You selected:', sqft)
+# Sidebar for customization options
+st.sidebar.header("Visualization Settings")
 
 
-area_type = 'Plot  Area'
-availability = 'Ready To Move'
+# Load the stock data
+@st.cache_data
+def load_data():
+    return px.data.stocks()
 
 
+df = load_data()
 
+# Display data information
+with st.expander("View Raw Data"):
+    st.dataframe(df)
+    st.write(f"Features available: {', '.join(df.columns[1:])}")
+    st.write(f"Date range: {df['date'].min()} to {df['date'].max()}")
 
+# Sidebar options
+# Company selection
+companies = st.sidebar.multiselect(
+    "Select Companies to Display",
+    options=df.columns[1:],
+    default=list(df.columns[1:])
+)
 
-# Input in the form : Location, BHK, Bath, Balcony, Sqft, area_type, availability.
+# Color theme selection
+color_theme = st.sidebar.selectbox(
+    "Select Color Theme",
+    options=["plotly_dark", "plotly", "ggplot2", "seaborn", "simple_white"],
+    index=0
+)
 
-# def predict(location, bhk, balcony, sqft, area_type, availability):
+# Chart dimensions
+col1, col2 = st.sidebar.columns(2)
+with col1:
+    width = st.number_input("Width", min_value=500, max_value=3000, value=1200, step=100)
+with col2:
+    height = st.number_input("Height", min_value=400, max_value=1600, value=600, step=100)
 
-#     # processing user input
-#     lists = [location, bhk, balcony, sqft, area_type, availability]
+# Title customization
+title_text = st.sidebar.text_input("Chart Title", "Stock Values Over Time")
+title_size = st.sidebar.slider("Title Size", 10, 50, 24)
+title_color = st.sidebar.color_picker("Title Color", "#FF0000")  # Red default
 
-#     df = pd.DataFrame(lists).transpose()
-#     # scaling the data
-#     # scaler.transform(df)
-#     # making predictions using the train model
-#     prediction = model.predict(df)
-#     result = int(prediction)
-#     return result
-from numpy.random import randint
+# Axis label customization
+axis_label_size = st.sidebar.slider("Axis Label Size", 10, 40, 16)
+axis_label_color = st.sidebar.color_picker("Axis Label Color", "#FFFF00")  # Yellow default
 
-values = randint(5000,11000,1)
-value = int(values)
+# Line customization
+line_width = st.sidebar.slider("Line Width", 1, 10, 4)
 
-def prediction(bhk, balcony, sqft):
-    if bhk == 1:
-        price = bhk*523
-    else:
-        price = bhk*600
-    
-    price1 = price+sqft*value
-    return price1
+# Create the visualization
+if companies:
+    # Create figure
+    fig = go.Figure()
 
-button = st.button('predict')
-if button:
+    for company in companies:
+        fig.add_trace(go.Scatter(
+            x=df['date'],
+            y=df[company],
+            name=company,
+            line=dict(width=line_width)
+        ))
 
-    # make prediction
-    result = prediction(bhk, balcony, sqft)
-    st.success(f'The value of the house is ₹ {result}')
+    # Update layout based on user selections
+    fig.update_layout(
+        title=title_text,
+        title_font=dict(color=title_color, size=title_size, family='Arial'),
+        title_x=0.5,
+        xaxis_title='Date',
+        yaxis_title='Stock Value',
+        xaxis=dict(title_font=dict(color=axis_label_color, size=axis_label_size)),
+        yaxis=dict(title_font=dict(color=axis_label_color, size=axis_label_size)),
+        legend_title_font=dict(size=16),
+        width=width,
+        height=height,
+        template=color_theme
+    )
+
+    # Display the chart
+    st.plotly_chart(fig, use_container_width=True)
+else:
+    st.warning("Please select at least one company to display")
+
+# Add some additional features
+st.subheader("Stock Statistics")
+
+if companies:
+    # Create a stats dataframe for selected companies
+    stats_df = pd.DataFrame({
+        'Company': companies,
+        'Min': [df[company].min().round(2) for company in companies],
+        'Max': [df[company].max().round(2) for company in companies],
+        'Mean': [df[company].mean().round(2) for company in companies],
+        'Std Dev': [df[company].std().round(2) for company in companies],
+        'Last Value': [df[company].iloc[-1].round(2) for company in companies]
+    })
+
+    st.dataframe(stats_df, use_container_width=True)
+
+    # Add a feature to download the data
+    st.download_button(
+        label="Download Selected Data as CSV",
+        data=df[['date'] + companies].to_csv(index=False).encode('utf-8'),
+        file_name='selected_stock_data.csv',
+        mime='text/csv',
+    )
+
+# Footer
+st.markdown("---")
+st.markdown("Created with Streamlit and Plotly")
